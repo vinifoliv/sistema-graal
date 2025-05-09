@@ -1,0 +1,17 @@
+from decimal import Decimal
+
+
+class Produto:
+    def __init__(
+        self,
+        ean_produto: str,
+        descricao: str,
+        preco: Decimal,
+        quantidade: int,
+        unidade: str,
+    ):
+        self.ean_produto = ean_produto
+        self.descricao = descricao
+        self.preco = preco
+        self.quantidade = quantidade
+        self.unidade = unidade

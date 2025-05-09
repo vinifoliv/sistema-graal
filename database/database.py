@@ -26,3 +26,6 @@ class Database:
 
     def fetchall(self):
         return self._cursor.fetchall()
+
+    def commit(self):
+        self._cnx.commit()  
