@@ -1,4 +1,5 @@
 from decimal import Decimal
+from typing import List
 from domain.produto import Produto
 from model.produto_model import ProdutoModel
 
@@ -42,7 +43,11 @@ class ProdutoController:
     def buscar(self):
         produtos = self._produto_model.buscar()
         return produtos
-
+    
+    def filtrar_por_descricao(self, descricao: str) -> List[Produto]:
+        produtos = self._produto_model.filtrar_por_descricao(descricao)
+        return produtos
+        
     def excluir(self, ean_produto: str):
         produto_existe = self._produto_model.buscar_por_ean(ean_produto)
         if not produto_existe:

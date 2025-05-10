@@ -1,3 +1,4 @@
+from typing import List
 from database.database import Database
 from domain.produto import Produto
 
@@ -38,7 +39,7 @@ class ProdutoModel:
         )
         self._database.commit()
 
-    def buscar(self):
+    def buscar(self) -> List[Produto]:
         self._database.execute(
             """
             SELECT * FROM produto
@@ -74,6 +75,17 @@ class ProdutoModel:
             return None
 
         return self._montar_produto(produto)
+
+    def filtrar_por_descricao(self, descricao: str) -> List[Produto]:
+        self._database.execute(
+            """
+            SELECT * FROM produto WHERE LOWER(descricao) LIKE LOWER(%s)
+            """,
+            ("%" + descricao + "%",),
+        )
+
+        produtos = self._database.fetchall()
+        return list(map(lambda p: self._montar_produto(p), produtos))
 
     def excluir(self, ean_produto: str):
         self._database.execute(

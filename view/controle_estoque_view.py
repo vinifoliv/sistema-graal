@@ -1,8 +1,8 @@
 from tkinter import *
-from tkinter.ttk import Style, Treeview
 from typing import Callable
 
 from controller.produto_controller import ProdutoController
+from view.tabela import Tabela
 
 
 class ControleEstoqueView(Frame):
@@ -83,7 +83,9 @@ class ControleEstoqueView(Frame):
 
     def _botoes(self):
         self._label(text="PESQUISA", column=0, row=3)
-        self._entry(column=1, row=3)
+        self._entry_pesquisa = Entry(self, **self._entry_config)
+        self._entry_pesquisa.grid(column=1, row=3, padx=10, pady=10, sticky="we")
+        self._entry_pesquisa.bind("<KeyRelease>", self._filtrar_produtos)
 
         self._button(
             text="CADASTRAR", column=2, row=3, columnspan=2, command=self._cadastrar
@@ -96,53 +98,28 @@ class ControleEstoqueView(Frame):
         )
 
     def _tabela_de_produtos(self):
-        # ESTILIZAÇÃO DA TABELA
-        style = Style(self)
-        style.configure("Treeview", font=("Arial", 16))
-        style.configure("Treeview.Heading", font=("Arial", 20, "bold"))
-
+        self._tabela = Tabela(self._preencher_entries, self)
         produtos = self._produto_controller.buscar()
-
-        colunas = ("EAN", "DESCRIÇÃO", "PREÇO", "QUANTIDADE", "UNIDADE")
-        self._tabela = Treeview(self, columns=colunas, show="headings")
-
-        for coluna in colunas:
-            self._tabela.heading(coluna, text=coluna, anchor="center")
-            self._tabela.column(coluna, anchor="center")
-
-        for produto in produtos:
-            
-            self._tabela.insert(
-                "",
-                END,
-                values=(
-                    produto.ean_produto,
-                    produto.descricao,
-                    produto.preco,
-                    produto.quantidade,
-                    produto.unidade,
-                ),
-            )
-
-        # SCROLLBAR
-        scroll_y = Scrollbar(self._tabela, orient=VERTICAL, command=self._tabela.yview)
-        self._tabela.configure(yscrollcommand=scroll_y.set)
-
-        self._tabela.bind("<Double-1>", self._preencher_entries)
-        self._tabela.grid(column=0, row=4, columnspan=8, rowspan=7, sticky="nsew")
+        self._tabela.listar_produtos(produtos)
 
     def _button(self, text: str, column: int, row: int, columnspan=1, command=Callable):
         Button(self, **self._button_config, text=text, command=command).grid(
             column=column, row=row, columnspan=columnspan, padx=5, pady=5, sticky="we"
         )
 
-    def _entry(self, column: int, row: int, columnspan=1):
-        Entry(self, **self._entry_config).grid(
-            column=column, row=row, columnspan=columnspan, padx=10, pady=10, sticky="we"
-        )
-
     def _label(self, text: str, column: int, row: int):
         Label(self, **self._label_config, text=text).grid(column=column, row=row)
+
+    def _filtrar_produtos(self, _):
+        pesquisa = self._entry_pesquisa.get()
+
+        produtos = []
+        if pesquisa == "":
+            produtos = self._produto_controller.buscar()
+        else:
+            produtos = self._produto_controller.filtrar_por_descricao(pesquisa)
+
+        self._tabela.listar_produtos(produtos)
 
     def _preencher_entries(self, _):
         item_selecionado = self._tabela.focus()
@@ -187,8 +164,6 @@ class ControleEstoqueView(Frame):
         preco = float(self._entry_preco.get())
         quantidade = int(self._entry_quantidade.get())
         unidade = self._entry_unidade.get()
-
-        print(ean_produto, descricao, preco, quantidade, unidade)
 
         self._produto_controller.alterar(
             ean_produto, descricao, preco, quantidade, unidade
