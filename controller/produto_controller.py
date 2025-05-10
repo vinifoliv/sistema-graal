@@ -15,7 +15,7 @@ class ProdutoController:
         quantidade: int,
         unidade: str,
     ):
-        produto = Produto(ean_produto, descricao, Decimal(preco), quantidade, unidade)
+        produto = Produto(ean_produto, descricao, preco, quantidade, unidade)
 
         produto_existe = self._produto_model.buscar_por_descricao(produto.descricao)
         if produto_existe:
@@ -31,13 +31,17 @@ class ProdutoController:
         quantidade: int,
         unidade: str,
     ):
-        produto = Produto(ean_produto, descricao, Decimal(preco), quantidade, unidade)
+        produto = Produto(ean_produto, descricao, preco, quantidade, unidade)
 
         produto_existe = self._produto_model.buscar_por_ean(produto.ean_produto)
         if not produto_existe:
             raise ValueError("O produto não existe!")
 
         self._produto_model.alterar(produto)
+
+    def buscar(self):
+        produtos = self._produto_model.buscar()
+        return produtos
 
     def excluir(self, ean_produto: str):
         produto_existe = self._produto_model.buscar_por_ean(ean_produto)

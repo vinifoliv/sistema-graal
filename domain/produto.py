@@ -6,7 +6,7 @@ class Produto:
         self,
         ean_produto: str,
         descricao: str,
-        preco: Decimal,
+        preco: float,
         quantidade: int,
         unidade: str,
     ):

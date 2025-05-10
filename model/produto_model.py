@@ -1,4 +1,3 @@
-from decimal import Decimal
 from database.database import Database
 from domain.produto import Produto
 
@@ -39,6 +38,15 @@ class ProdutoModel:
         )
         self._database.commit()
 
+    def buscar(self):
+        self._database.execute(
+            """
+            SELECT * FROM produto
+            """
+        )
+        produtos = self._database.fetchall()
+        return list(map(lambda p: self._montar_produto(p), produtos))
+
     def buscar_por_descricao(self, descricao: str) -> Produto | None:
         self._database.execute(
             """
@@ -51,7 +59,7 @@ class ProdutoModel:
         if not produto:
             return None
 
-        return produto
+        return self._montar_produto(produto)
 
     def buscar_por_ean(self, ean_produto: str) -> Produto | None:
         self._database.execute(
@@ -65,7 +73,7 @@ class ProdutoModel:
         if not produto:
             return None
 
-        return produto
+        return self._montar_produto(produto)
 
     def excluir(self, ean_produto: str):
         self._database.execute(
@@ -75,3 +83,11 @@ class ProdutoModel:
             (ean_produto,),
         )
         self._database.commit()
+
+    def _montar_produto(self, produto) -> Produto:
+        ean_produto = produto[0]
+        descricao = produto[1]
+        preco = produto[2]
+        unidade = produto[3]
+        quantidade = produto[4]
+        return Produto(ean_produto, descricao, preco, quantidade, unidade)
