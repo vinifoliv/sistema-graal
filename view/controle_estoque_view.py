@@ -85,7 +85,7 @@ class ControleEstoqueView(Frame):
         self._label(text="PESQUISA", column=0, row=3)
         self._entry_pesquisa = Entry(self, **self._entry_config)
         self._entry_pesquisa.grid(column=1, row=3, padx=10, pady=10, sticky="we")
-        self._entry_pesquisa.bind("<KeyRelease>", self._filtrar_produtos)
+        self._entry_pesquisa.bind("<KeyRelease>", lambda _: self._filtrar_produtos())
 
         self._button(
             text="CADASTRAR", column=2, row=3, columnspan=2, command=self._cadastrar
@@ -110,7 +110,7 @@ class ControleEstoqueView(Frame):
     def _label(self, text: str, column: int, row: int):
         Label(self, **self._label_config, text=text).grid(column=column, row=row)
 
-    def _filtrar_produtos(self, _):
+    def _filtrar_produtos(self):
         pesquisa = self._entry_pesquisa.get()
 
         produtos = []
@@ -157,6 +157,7 @@ class ControleEstoqueView(Frame):
         )
 
         self._limpar_dados()
+        self._filtrar_produtos()
 
     def _alterar(self):
         ean_produto = self._entry_ean_produto.get()
@@ -170,11 +171,12 @@ class ControleEstoqueView(Frame):
         )
 
         self._limpar_dados()
+        
+
 
     def _excluir(self):
         ean_produto = self._entry_ean_produto.get()
         self._produto_controller.excluir(ean_produto)
-
         self._limpar_dados()
 
     def _limpar_dados(self):
@@ -183,3 +185,4 @@ class ControleEstoqueView(Frame):
         self._entry_quantidade.delete(0, END)
         self._entry_descricao.delete(0, END)
         self._entry_unidade.delete(0, END)
+        self._filtrar_produtos()
