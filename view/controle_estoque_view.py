@@ -99,6 +99,7 @@ class ControleEstoqueView(Frame):
 
     def _tabela_de_produtos(self):
         self._tabela = Tabela(self._preencher_entries, self)
+        self._tabela.grid(column=0, row=4, columnspan=8, rowspan=7, sticky="nsew")
         produtos = self._produto_controller.buscar()
         self._tabela.listar_produtos(produtos)
 

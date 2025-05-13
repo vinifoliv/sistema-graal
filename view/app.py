@@ -10,7 +10,8 @@ class App:
     def __init__(self, produto_controller: ProdutoController):
         self._root = Tk()
         self._root.state("zoomed")
-        self._controle_estoque = ControleEstoqueView(produto_controller, self._root)
+        self._caixa_eletronico = CaixaEletronicoView(self._root)
+        #self._controle_estoque = ControleEstoqueView(produto_controller, self._root)
 
     def executar(self):
         self._root.mainloop()
