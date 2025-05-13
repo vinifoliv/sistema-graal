@@ -1,9 +1,105 @@
-from decimal import Decimal
+from typing import List
+from database.database import Database
+from domain.produto import Produto
 
 
 class ProdutoModel:
-    def __init__(self, ean_produto: str, descricao: str, preco: Decimal, unidade: str):
-        self.ean_produto = ean_produto
-        self.descricao = descricao
-        self.preco = preco
-        self.unidade = unidade
+    def __init__(self, database: Database):
+        self._database = database
+
+    def cadastrar(self, produto: Produto):
+        self._database.execute(
+            """
+            INSERT INTO produto(ean_produto, descricao, preco, quantidade, unidade)
+            VALUES(%s, %s, %s, %s, %s)
+            """,
+            (
+                produto.ean_produto,
+                produto.descricao,
+                float(produto.preco),
+                produto.quantidade,
+                produto.unidade,
+            ),
+        )
+        self._database.commit()
+
+    def alterar(self, produto: Produto):
+        self._database.execute(
+            """
+            UPDATE produto SET descricao=%s, preco=%s, quantidade=%s, unidade=%s
+            WHERE ean_produto=%s
+            """,
+            (
+                produto.descricao,
+                produto.preco,
+                produto.quantidade,
+                produto.unidade,
+                produto.ean_produto,
+            ),
+        )
+        self._database.commit()
+
+    def buscar(self) -> List[Produto]:
+        self._database.execute(
+            """
+            SELECT * FROM produto
+            """
+        )
+        produtos = self._database.fetchall()
+        return list(map(lambda p: self._montar_produto(p), produtos))
+
+    def buscar_por_descricao(self, descricao: str) -> Produto | None:
+        self._database.execute(
+            """
+            SELECT * FROM produto WHERE descricao=%s
+            """,
+            (descricao,),
+        )
+
+        produto = self._database.fetchone()
+        if not produto:
+            return None
+
+        return self._montar_produto(produto)
+
+    def buscar_por_ean(self, ean_produto: str) -> Produto | None:
+        self._database.execute(
+            """
+            SELECT * FROM produto WHERE ean_produto=%s
+            """,
+            (ean_produto,),
+        )
+
+        produto = self._database.fetchone()
+        if not produto:
+            return None
+
+        return self._montar_produto(produto)
+
+    def filtrar_por_descricao(self, descricao: str) -> List[Produto]:
+        self._database.execute(
+            """
+            SELECT * FROM produto WHERE LOWER(descricao) LIKE LOWER(%s)
+            """,
+            ("%" + descricao + "%",),
+        )
+
+        produtos = self._database.fetchall()
+        return list(map(lambda p: self._montar_produto(p), produtos))
+
+    def excluir(self, ean_produto: str):
+        self._database.execute(
+            """
+            DELETE FROM produto WHERE ean_produto=%s
+            """,
+            (ean_produto,),
+        )
+        self._database.commit()
+
+    def _montar_produto(self, produto) -> Produto:
+        ean_produto = produto[0]
+        descricao = produto[1]
+        preco = produto[2]
+        unidade = produto[3]
+        quantidade = produto[4]
+        return Produto(ean_produto, descricao, preco, quantidade, unidade)
