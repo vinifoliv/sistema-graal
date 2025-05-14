@@ -1,5 +1,10 @@
 from tkinter import *
+from typing import List
 
+from controller.produto_controller import ProdutoController
+from controller.venda_controller import VendaController
+from domain.item import Item
+from domain.venda import Venda
 from view.button import Botao
 from view.input import Input
 from view.label import Etiqueta
@@ -7,14 +12,23 @@ from view.tabela import Tabela
 
 
 class CaixaEletronicoView(Frame):
-    def __init__(self, master: Tk = None):
+    def __init__(
+        self,
+        produto_controller: ProdutoController,
+        venda_controller: VendaController,
+        master: Tk = None,
+    ):
         super().__init__(master, bg="Red")
+        self._produto_controller = produto_controller
+        self._venda_controller = venda_controller
 
         self._lista_de_itens()
         self._resumo_da_venda()
         self._dados_do_produto()
         self._botoes()
         self._background()
+
+        self._itens_venda: List[Item] = []
 
         self.pack(fill=BOTH, expand=True)
 
@@ -46,15 +60,31 @@ class CaixaEletronicoView(Frame):
         self._entry_subtotal.grid(column=1, row=11, sticky="we", padx=10, pady=10)
 
     def _dados_do_produto(self):
+        Etiqueta(text="FUNCIONÁRIO:", master=self).grid(
+            column=2, columnspan=3, row=1, sticky="we", padx=10, pady=10
+        )
+        self._etiqueta_nome_funcionario = Etiqueta(text="", master=self)
+        self._etiqueta_nome_funcionario.grid(
+            column=5, columnspan=3, row=1, sticky="we", padx=10, pady=10
+        )
+
+        self._entry_codigo_funcionario = Input(self)
+        self._entry_codigo_funcionario.grid(
+            column=2, columnspan=6, row=2, sticky="we", padx=10, pady=10
+        )
+        self._entry_codigo_funcionario.bind(
+            "<KeyRelease>", lambda _: self._atualizar_nome_funcionario()
+        )
+
         Etiqueta(text="EAN", master=self).grid(
             column=2, columnspan=3, row=3, sticky="we", padx=10, pady=10
         )
-        self._ean_produto = Input(self)
-        self._ean_produto.grid(
+        self._entry_ean_produto = Input(self)
+        self._entry_ean_produto.grid(
             column=2, columnspan=3, row=4, sticky="we", padx=10, pady=10
         )
 
-        Etiqueta(text="Preço", master=self).grid(
+        Etiqueta(text="PREÇO", master=self).grid(
             column=5, columnspan=3, row=3, sticky="we", padx=10, pady=10
         )
         self._entry_preco = Input(self)
@@ -76,6 +106,9 @@ class CaixaEletronicoView(Frame):
         self._entry_quantidade = Input(self)
         self._entry_quantidade.grid(
             column=2, columnspan=3, row=8, sticky="we", padx=10, pady=10
+        )
+        self._entry_quantidade.bind(
+            "<KeyRelease>", lambda _: self._calcular_total_item()
         )
 
         Etiqueta(text="UNIDADE", master=self).grid(
@@ -111,14 +144,53 @@ class CaixaEletronicoView(Frame):
 
         self.logotipo = PhotoImage(file="./static/logotipo.png", width=300, height=300)
         Label(self, image=self.logotipo, bd=0, bg="#003095").grid(
-            column=2, columnspan=6, row=0, rowspan=3, padx=10, pady=10, sticky="we"
+            column=2, columnspan=6, row=0, padx=10, pady=10, sticky="we"
         )
 
+    def _atualizar_nome_funcionario(self):
+        codigo_funcionario = self._entry_codigo_funcionario.get()
+        funcionario = self._venda_controller.buscar_funcionario_por_codigo(
+            codigo_funcionario
+        )
+        if not funcionario:
+            self._etiqueta_nome_funcionario.texto("")
+            return
+        self._etiqueta_nome_funcionario.texto(funcionario.nome.upper())
+
     def _cadastrar(self):
-        pass
+        ean_produto = self._entry_ean_produto.get()
+        quantidade = int(self._entry_quantidade.get())
+        novo_item = Item(ean_produto, quantidade)
+        self._itens_venda.append(novo_item)
+        self._limpar_dados_produtos()
 
     def _consultar(self):
-        pass
+        ean_produto = self._entry_ean_produto.get()
+        produto = self._produto_controller.buscar_por_ean(ean_produto)
+        if not produto:
+            return
+        self._entry_ean_produto.texto(produto.ean_produto)
+        self._entry_descricao.texto(produto.descricao)
+        self._entry_preco.texto(produto.preco)
+        self._entry_unidade.texto(produto.unidade)
 
     def _finalizar(self):
         pass
+
+    def _calcular_total_item(self):
+        quantidade = self._entry_quantidade.get()
+        if quantidade == "":
+            self._entry_total_do_item.texto(0.0)
+            return
+        quantidade = int(quantidade)
+        preco = float(self._entry_preco.get())
+        total_item = quantidade * preco
+        self._entry_total_do_item.texto(total_item)
+
+    def _limpar_dados_produtos(self):
+        self._entry_ean_produto.limpar()
+        self._entry_preco.limpar()
+        self._entry_descricao.limpar()
+        self._entry_quantidade.limpar()
+        self._entry_unidade.limpar()
+        self._entry_total_do_item.limpar()

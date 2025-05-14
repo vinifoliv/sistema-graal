@@ -11,3 +11,6 @@ class Etiqueta(Label):
             fg="white",
             bg="#003095",
         )
+
+    def texto(self, valor: str):
+        self.config(text=valor)
