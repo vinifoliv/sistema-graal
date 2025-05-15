@@ -22,21 +22,20 @@ class CaixaEletronicoView(Frame):
         self._produto_controller = produto_controller
         self._venda_controller = venda_controller
 
-        self._lista_de_itens()
+        self._itens_venda: List[Item] = []
+
         self._resumo_da_venda()
         self._dados_do_produto()
         self._botoes()
+        self._lista_de_itens()
         self._background()
-
-        self._itens_venda: List[Item] = []
 
         self.pack(fill=BOTH, expand=True)
 
     def _lista_de_itens(self):
         self._tabela = Tabela(lambda: print("Hello, world!"), self)
         self._tabela.grid(column=0, columnspan=2, row=0, rowspan=8, sticky="nsew")
-        # produtos = self._produto_controller.buscar()
-        # self._tabela.listar_produtos(produtos)
+        self._atualizar_tabela()
 
     def _resumo_da_venda(self):
         Etiqueta(text="SUBTOTAL", master=self).grid(
@@ -52,12 +51,15 @@ class CaixaEletronicoView(Frame):
         )
         self._entry_total_recebido = Input(master=self)
         self._entry_total_recebido.grid(column=0, row=11, sticky="we", padx=10, pady=10)
+        self._entry_total_recebido.bind(
+            "<KeyRelease>", lambda _: self._atualizar_troco()
+        )
 
         Etiqueta(text="TROCO", master=self).grid(
             column=1, row=10, sticky="we", padx=10, pady=10
         )
-        self._entry_subtotal = Input(self)
-        self._entry_subtotal.grid(column=1, row=11, sticky="we", padx=10, pady=10)
+        self._entry_troco = Input(self)
+        self._entry_troco.grid(column=1, row=11, sticky="we", padx=10, pady=10)
 
     def _dados_do_produto(self):
         Etiqueta(text="FUNCIONÁRIO:", master=self).grid(
@@ -159,9 +161,15 @@ class CaixaEletronicoView(Frame):
 
     def _cadastrar(self):
         ean_produto = self._entry_ean_produto.get()
+        descricao = self._entry_descricao.get()
+        preco = float(self._entry_preco.get())
         quantidade = int(self._entry_quantidade.get())
-        novo_item = Item(ean_produto, quantidade)
+        unidade = (self._entry_unidade.get())
+
+        novo_item = Item(ean_produto, descricao, preco, quantidade, unidade)
+
         self._itens_venda.append(novo_item)
+        self._atualizar_tabela()
         self._limpar_dados_produtos()
 
     def _consultar(self):
@@ -169,13 +177,18 @@ class CaixaEletronicoView(Frame):
         produto = self._produto_controller.buscar_por_ean(ean_produto)
         if not produto:
             return
+        print(produto.unidade)
         self._entry_ean_produto.texto(produto.ean_produto)
         self._entry_descricao.texto(produto.descricao)
         self._entry_preco.texto(produto.preco)
         self._entry_unidade.texto(produto.unidade)
 
     def _finalizar(self):
-        pass
+        codigo_funcionario = self._entry_codigo_funcionario.get()
+        self._venda_controller.cadastrar_venda(codigo_funcionario, self._itens_venda)
+
+        self._itens_venda.clear()
+        self._atualizar_tabela()
 
     def _calcular_total_item(self):
         quantidade = self._entry_quantidade.get()
@@ -187,6 +200,10 @@ class CaixaEletronicoView(Frame):
         total_item = quantidade * preco
         self._entry_total_do_item.texto(total_item)
 
+    def _calcular_subtotal(self):
+        subtotal = sum(item.preco * item.quantidade for item in self._itens_venda)
+        return subtotal
+
     def _limpar_dados_produtos(self):
         self._entry_ean_produto.limpar()
         self._entry_preco.limpar()
@@ -194,3 +211,17 @@ class CaixaEletronicoView(Frame):
         self._entry_quantidade.limpar()
         self._entry_unidade.limpar()
         self._entry_total_do_item.limpar()
+
+    def _atualizar_tabela(self):
+        self._tabela.listar_produtos(self._itens_venda)
+
+        subtotal = self._calcular_subtotal()
+        self._entry_subtotal.texto(subtotal)
+
+        self._atualizar_troco()
+
+    def _atualizar_troco(self):
+        subtotal = self._calcular_subtotal()
+        total_recebido = float(self._entry_total_recebido.get() or 0)
+        troco = max(total_recebido - subtotal, 0.0)
+        self._entry_troco.texto(troco)

@@ -1,4 +1,7 @@
+from typing import List
 from domain.funcionario import Funcionario
+from domain.item import Item
+from domain.venda import Venda
 from model.venda_model import VendaModel
 
 
@@ -13,3 +16,7 @@ class VendaController:
             codigo_funcionario
         )
         return funcionario
+
+    def cadastrar_venda(self, codigo_funcionario: str, itens: List[Item]):
+        venda = Venda(codigo_funcionario, itens)
+        self._venda_model.cadastrar_venda(venda)
