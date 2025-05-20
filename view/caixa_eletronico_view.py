@@ -1,5 +1,5 @@
 from tkinter import *
-from typing import List
+from typing import Callable, List
 
 from controller.produto_controller import ProdutoController
 from controller.venda_controller import VendaController
@@ -16,11 +16,13 @@ class CaixaEletronicoView(Frame):
         self,
         produto_controller: ProdutoController,
         venda_controller: VendaController,
+        mostrar_tela: Callable,
         master: Tk = None,
     ):
         super().__init__(master, bg="Red")
         self._produto_controller = produto_controller
         self._venda_controller = venda_controller
+        self._mostrar_tela = mostrar_tela
 
         self._itens_venda: List[Item] = []
 
@@ -30,7 +32,8 @@ class CaixaEletronicoView(Frame):
         self._lista_de_itens()
         self._background()
 
-        self.pack(fill=BOTH, expand=True)
+        self.grid_rowconfigure(0, weight=1)
+        self.grid_columnconfigure(0, weight=1)
 
     def _lista_de_itens(self):
         self._tabela = Tabela(lambda: print("Hello, world!"), self)
@@ -131,14 +134,19 @@ class CaixaEletronicoView(Frame):
 
     def _botoes(self):
         Botao(text="CADASTRAR", command=self._cadastrar, master=self).grid(
-            column=2, row=11, columnspan=2, sticky="we", padx=10, pady=10
+            column=1, row=11, sticky="we", padx=10, pady=10
         )
         Botao(text="CONSULTAR", command=self._consultar, master=self).grid(
-            column=4, row=11, columnspan=2, sticky="we", padx=10, pady=10
+            column=3, row=11, sticky="we", padx=10, pady=10
         )
         Botao(text="FINALIZAR", command=self._finalizar, master=self).grid(
-            column=6, row=11, columnspan=2, sticky="we", padx=10, pady=10
+            column=5, row=11, sticky="we", padx=10, pady=10
         )
+        Botao(
+            text="GESTÃO",
+            command=lambda: self._mostrar_tela("controle-estoque"),
+            master=self,
+        ).grid(column=6, row=11, sticky="we", padx=10, pady=10)
 
     def _background(self):
         self.config(bg="#003095")
@@ -164,7 +172,7 @@ class CaixaEletronicoView(Frame):
         descricao = self._entry_descricao.get()
         preco = float(self._entry_preco.get())
         quantidade = int(self._entry_quantidade.get())
-        unidade = (self._entry_unidade.get())
+        unidade = self._entry_unidade.get()
 
         novo_item = Item(ean_produto, descricao, preco, quantidade, unidade)
 

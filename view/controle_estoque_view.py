@@ -9,10 +9,12 @@ class ControleEstoqueView(Frame):
     def __init__(
         self,
         produto_controller: ProdutoController,
+        mostrar_telas: Callable,
         master=None,
     ):
         super().__init__(master)
         self._produto_controller = produto_controller
+        self._mostrar_telas = mostrar_telas
 
         self._entry_config = {
             "bd": 0,
@@ -37,7 +39,7 @@ class ControleEstoqueView(Frame):
         self._dados_produto()
         self._botoes()
         self._tabela_de_produtos()
-        self.pack(fill=BOTH, expand=True)
+        # self.pack(fill=BOTH, expand=True)
 
     def _background(self):
         # Plano de fundo
@@ -172,8 +174,6 @@ class ControleEstoqueView(Frame):
         )
 
         self._limpar_dados()
-        
-
 
     def _excluir(self):
         ean_produto = self._entry_ean_produto.get()
