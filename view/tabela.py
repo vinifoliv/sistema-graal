@@ -20,7 +20,7 @@ class Tabela(Treeview):
             self.column(coluna, anchor="center")
 
         self.bind("<Double-1>", self._preencher_entries)
-        self.grid(column=0, row=4, columnspan=8, rowspan=7, sticky="nsew")
+        
 
     def _configurar_estilo(self):
         self._style = Style(self.master)
@@ -36,6 +36,7 @@ class Tabela(Treeview):
             self.delete(produto)
 
         for produto in produtos:
+            print(produto.unidade)
             self.insert(
                 "",
                 END,
