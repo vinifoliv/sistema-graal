@@ -4,7 +4,6 @@ from typing import Callable, List
 from controller.produto_controller import ProdutoController
 from controller.venda_controller import VendaController
 from domain.item import Item
-from domain.venda import Venda
 from view.button import Botao
 from view.input import Input
 from view.label import Etiqueta

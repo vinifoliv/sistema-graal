@@ -2,6 +2,9 @@ from tkinter import *
 from typing import Callable
 
 from controller.produto_controller import ProdutoController
+from view.button import Botao
+from view.input import Input
+from view.label import Etiqueta
 from view.tabela import Tabela
 
 
@@ -16,30 +19,10 @@ class ControleEstoqueView(Frame):
         self._produto_controller = produto_controller
         self._mostrar_telas = mostrar_telas
 
-        self._entry_config = {
-            "bd": 0,
-            "font": ("Arial", 20),
-        }
-
-        self._button_config = {
-            "bd": 0,
-            "font": ("Arial", 20),
-            "fg": "white",
-            "bg": "#b40022",
-        }
-
-        self._label_config = {
-            "bd": 0,
-            "font": ("Arial", 20, "bold"),
-            "fg": "white",
-            "bg": "#003095",
-        }
-
         self._background()
         self._dados_produto()
         self._botoes()
         self._tabela_de_produtos()
-        # self.pack(fill=BOTH, expand=True)
 
     def _background(self):
         # Plano de fundo
@@ -53,65 +36,77 @@ class ControleEstoqueView(Frame):
         )
 
     def _dados_produto(self):
-        self._label(text="EAN", column=2, row=0)
-        self._entry_ean_produto = Entry(self, **self._entry_config)
+        Etiqueta(text="EAN", master=self).grid(
+            column=2, row=0, sticky="we", padx=10, pady=10
+        )
+        self._entry_ean_produto = Input(self)
         self._entry_ean_produto.grid(
             column=3, row=0, columnspan=1, padx=10, pady=10, sticky="we"
         )
 
-        self._label(text="PREÇO", column=4, row=0)
-        self._entry_preco = Entry(self, **self._entry_config)
+        Etiqueta(text="PREÇO", master=self).grid(
+            column=4, row=0, sticky="we", padx=10, pady=10
+        )
+        self._entry_preco = Input(self)
         self._entry_preco.grid(
             column=5, row=0, columnspan=1, padx=10, pady=10, sticky="we"
         )
 
-        self._label(text="QUANTIDADE", column=6, row=0)
-        self._entry_quantidade = Entry(self, **self._entry_config)
+        Etiqueta(text="QUANTIDADE", master=self).grid(
+            column=6, row=0, sticky="we", padx=10, pady=10
+        )
+        self._entry_quantidade = Input(self)
         self._entry_quantidade.grid(
             column=7, row=0, columnspan=1, padx=10, pady=10, sticky="we"
         )
 
-        self._label(text="DESCRIÇÃO", column=2, row=1)
-        self._entry_descricao = Entry(self, **self._entry_config)
+        Etiqueta(text="DESCRIÇÃO", master=self).grid(
+            column=2, row=1, sticky="we", padx=10, pady=10
+        )
+        self._entry_descricao = Input(self)
         self._entry_descricao.grid(
             column=3, row=1, columnspan=3, padx=10, pady=10, sticky="we"
         )
 
-        self._label(text="UNIDADE", column=6, row=1)
-        self._entry_unidade = Entry(self, **self._entry_config)
+        Etiqueta(text="UNIDADE", master=self).grid(
+            column=6, row=1, sticky="we", padx=10, pady=10
+        )
+        self._entry_unidade = Input(self)
         self._entry_unidade.grid(
             column=7, row=1, columnspan=1, padx=10, pady=10, sticky="we"
         )
 
     def _botoes(self):
-        self._label(text="PESQUISA", column=0, row=3)
-        self._entry_pesquisa = Entry(self, **self._entry_config)
+        Etiqueta(text="PEQUISA", master=self).grid(
+            column=0, row=3, sticky="we", padx=10, pady=10
+        )
+        self._entry_pesquisa = Input(self)
         self._entry_pesquisa.grid(column=1, row=3, padx=10, pady=10, sticky="we")
         self._entry_pesquisa.bind("<KeyRelease>", lambda _: self._filtrar_produtos())
 
-        self._button(
-            text="CADASTRAR", column=2, row=3, columnspan=2, command=self._cadastrar
+        Botao(text="CADASTRAR", command=self._cadastrar, master=self).grid(
+            column=2, row=3, sticky="we", padx=10, pady=10
         )
-        self._button(
-            text="ALTERAR", column=4, row=3, columnspan=2, command=self._alterar
+
+        Botao(text="ALTERAR", command=self._alterar, master=self).grid(
+            column=3, row=3, sticky="we", padx=10, pady=10
         )
-        self._button(
-            text="EXCLUIR", column=6, row=3, columnspan=2, command=self._excluir
+
+        Botao(text="EXCLUIR", command=self._excluir, master=self).grid(
+            column=4, row=3, sticky="we", padx=10, pady=10
         )
+
+        Botao(
+            text="CAIXA",
+            command=lambda: self._mostrar_telas("caixa-eletronico"),
+            master=self,
+        ).grid(column=5, row=3, sticky="we", padx=10, pady=10)
 
     def _tabela_de_produtos(self):
         self._tabela = Tabela(self._preencher_entries, self)
         self._tabela.grid(column=0, row=4, columnspan=8, rowspan=7, sticky="nsew")
         produtos = self._produto_controller.buscar()
         self._tabela.listar_produtos(produtos)
-
-    def _button(self, text: str, column: int, row: int, columnspan=1, command=Callable):
-        Button(self, **self._button_config, text=text, command=command).grid(
-            column=column, row=row, columnspan=columnspan, padx=5, pady=5, sticky="we"
-        )
-
-    def _label(self, text: str, column: int, row: int):
-        Label(self, **self._label_config, text=text).grid(column=column, row=row)
 
     def _filtrar_produtos(self):
         pesquisa = self._entry_pesquisa.get()
@@ -133,20 +128,11 @@ class ControleEstoqueView(Frame):
         if not produto:
             return
 
-        self._entry_ean_produto.delete(0, END)
-        self._entry_ean_produto.insert(0, produto[0])
-
-        self._entry_descricao.delete(0, END)
-        self._entry_descricao.insert(0, produto[1])
-
-        self._entry_preco.delete(0, END)
-        self._entry_preco.insert(0, produto[2])
-
-        self._entry_quantidade.delete(0, END)
-        self._entry_quantidade.insert(0, produto[3])
-
-        self._entry_unidade.delete(0, END)
-        self._entry_unidade.insert(0, produto[4])
+        self._entry_ean_produto.texto(produto[0])
+        self._entry_descricao.texto(produto[1])
+        self._entry_preco.texto(produto[2])
+        self._entry_quantidade.texto(produto[3])
+        self._entry_unidade.texto(produto[4])
 
     def _cadastrar(self):
         ean_produto = self._entry_ean_produto.get()
@@ -181,9 +167,9 @@ class ControleEstoqueView(Frame):
         self._limpar_dados()
 
     def _limpar_dados(self):
-        self._entry_ean_produto.delete(0, END)
-        self._entry_preco.delete(0, END)
-        self._entry_quantidade.delete(0, END)
-        self._entry_descricao.delete(0, END)
-        self._entry_unidade.delete(0, END)
+        self._entry_ean_produto.limpar()
+        self._entry_preco.limpar()
+        self._entry_quantidade.limpar()
+        self._entry_descricao.limpar()
+        self._entry_unidade.limpar()
         self._filtrar_produtos()

@@ -101,6 +101,6 @@ class ProdutoModel:
         ean_produto = produto[0]
         descricao = produto[1]
         preco = produto[2]
-        unidade = produto[3]
-        quantidade = produto[4]
+        quantidade = produto[3]
+        unidade = produto[4]
         return Produto(ean_produto, descricao, preco, quantidade, unidade)
