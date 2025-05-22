@@ -71,7 +71,6 @@ class ProdutoModel:
         )
 
         produto = self._database.fetchone()
-        print(produto)
         if not produto:
             return None
 

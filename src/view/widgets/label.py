@@ -10,6 +10,7 @@ class Etiqueta(Label):
             font=("Arial", 20, "bold"),
             fg="white",
             bg="#003095",
+            anchor="w",
         )
 
     def texto(self, valor: str):

@@ -2,10 +2,10 @@ from tkinter import *
 from typing import Callable
 
 from controller.produto_controller import ProdutoController
-from view.button import Botao
-from view.input import Input
-from view.label import Etiqueta
-from view.tabela import Tabela
+from view.widgets.button import Botao
+from view.widgets.input import Input
+from view.widgets.label import Etiqueta
+from view.widgets.tabela import Tabela
 
 
 class ControleEstoqueView(Frame):
@@ -30,7 +30,7 @@ class ControleEstoqueView(Frame):
         self.config(padx=15, pady=15)
 
         # Logotipo
-        self.logotipo = PhotoImage(file="./static/logotipo.png", width=300, height=300)
+        self.logotipo = PhotoImage(file="./src/static/logotipo.png", width=300, height=300)
         Label(self, image=self.logotipo, bd=0).grid(
             column=0, row=0, columnspan=2, rowspan=2, padx=10, pady=10
         )

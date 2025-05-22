@@ -4,10 +4,10 @@ from typing import Callable, List
 from controller.produto_controller import ProdutoController
 from controller.venda_controller import VendaController
 from domain.item import Item
-from view.button import Botao
-from view.input import Input
-from view.label import Etiqueta
-from view.tabela import Tabela
+from view.widgets.label import Etiqueta
+from view.widgets.tabela import Tabela
+from view.widgets.button import Botao
+from view.widgets.input import Input
 
 
 class CaixaEletronicoView(Frame):
@@ -133,25 +133,27 @@ class CaixaEletronicoView(Frame):
 
     def _botoes(self):
         Botao(text="CADASTRAR", command=self._cadastrar, master=self).grid(
-            column=1, row=11, sticky="we", padx=10, pady=10
+            column=2, row=11, sticky="we", padx=10, pady=10
         )
         Botao(text="CONSULTAR", command=self._consultar, master=self).grid(
             column=3, row=11, sticky="we", padx=10, pady=10
         )
         Botao(text="FINALIZAR", command=self._finalizar, master=self).grid(
-            column=5, row=11, sticky="we", padx=10, pady=10
+            column=4, row=11, sticky="we", padx=10, pady=10
         )
         Botao(
             text="GESTÃO",
             command=lambda: self._mostrar_tela("controle-estoque"),
             master=self,
-        ).grid(column=6, row=11, sticky="we", padx=10, pady=10)
+        ).grid(column=5, row=11, sticky="we", padx=10, pady=10)
 
     def _background(self):
         self.config(bg="#003095")
         self.config(padx=15, pady=15)
 
-        self.logotipo = PhotoImage(file="./static/logotipo.png", width=300, height=300)
+        self.logotipo = PhotoImage(
+            file="./src/static/logotipo.png", width=300, height=300
+        )
         Label(self, image=self.logotipo, bd=0, bg="#003095").grid(
             column=2, columnspan=6, row=0, padx=10, pady=10, sticky="we"
         )
@@ -184,7 +186,7 @@ class CaixaEletronicoView(Frame):
         produto = self._produto_controller.buscar_por_ean(ean_produto)
         if not produto:
             return
-        print(produto.unidade)
+
         self._entry_ean_produto.texto(produto.ean_produto)
         self._entry_descricao.texto(produto.descricao)
         self._entry_preco.texto(produto.preco)
