@@ -17,11 +17,13 @@ class VendaController:
         )
         return funcionario
 
-    def cadastrar_venda(self, codigo_funcionario: str, itens: List[Item]):
+    def cadastrar_venda(
+        self, codigo_funcionario: str, nome_cliente: str | None, itens: List[Item]
+    ):
         funcionario = self.buscar_funcionario_por_codigo(codigo_funcionario)
         if not funcionario:
             raise ValueError("Funcionário não encontrado!")
 
-        venda = Venda(funcionario.codigo_funcionario, itens)
+        venda = Venda(codigo_funcionario, nome_cliente, itens)
 
         self._venda_model.cadastrar_venda(venda)

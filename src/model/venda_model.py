@@ -1,5 +1,3 @@
-from datetime import date
-
 from database.database import Database
 from domain.funcionario import Funcionario
 from domain.venda import Venda
@@ -27,9 +25,9 @@ class VendaModel:
     def cadastrar_venda(self, venda: Venda):
         self._database.execute(
             """
-            INSERT INTO venda(codigo_funcionario) VALUES(%s)
+            INSERT INTO venda(codigo_funcionario, nome_cliente) VALUES(%s, %s)
             """,
-            (venda.codigo_funcionario,),
+            (venda.codigo_funcionario, venda.nome_cliente),
         )
 
         self._database.execute(

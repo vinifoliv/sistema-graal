@@ -1,5 +1,6 @@
 from tkinter import *
 from tkinter import messagebox
+from tkinter import simpledialog
 from typing import Callable, List
 
 from controller.produto_controller import ProdutoController
@@ -197,9 +198,12 @@ class CaixaEletronicoView(Frame):
     def _finalizar(self):
         try:
             codigo_funcionario = self._entry_codigo_funcionario.get()
+            nome_cliente = simpledialog.askstring("Dados do cliente", "Nome:") or None
+
             self._venda_controller.cadastrar_venda(
-                codigo_funcionario, self._itens_venda
+                codigo_funcionario, nome_cliente, self._itens_venda
             )
+
             self._itens_venda.clear()
             self._atualizar_tabela()
         except ValueError as e:
