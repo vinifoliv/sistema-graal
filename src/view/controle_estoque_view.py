@@ -2,9 +2,9 @@ from tkinter import *
 from typing import Callable
 
 from controller.produto_controller import ProdutoController
-from view.widgets.button import Botao
+from view.widgets.botao import Botao
 from view.widgets.input import Input
-from view.widgets.label import Etiqueta
+from view.widgets.etiqueta import Etiqueta
 from view.widgets.tabela import Tabela
 
 
@@ -19,94 +19,126 @@ class ControleEstoqueView(Frame):
         self._produto_controller = produto_controller
         self._mostrar_telas = mostrar_telas
 
-        self._background()
-        self._dados_produto()
-        self._botoes()
-        self._tabela_de_produtos()
-
-    def _background(self):
-        # Plano de fundo
         self.config(bg="#003095")
-        self.config(padx=15, pady=15)
 
-        # Logotipo
-        self.logotipo = PhotoImage(file="./src/static/logotipo.png", width=300, height=300)
-        Label(self, image=self.logotipo, bd=0).grid(
-            column=0, row=0, columnspan=2, rowspan=2, padx=10, pady=10
-        )
+        self.grid_columnconfigure(1, weight=1)
+        self.grid_rowconfigure(1, weight=1)
 
-    def _dados_produto(self):
-        Etiqueta(text="EAN", master=self).grid(
-            column=2, row=0, sticky="we", padx=10, pady=10
+        self._configurar_frame_logotipo()
+        self._configurar_frame_produto()
+        self._configurar_frame_tabela()
+
+    def _configurar_frame_logotipo(self):
+        self._frame_logotipo = Frame(self, bg="#000000")
+
+        self._logotipo = PhotoImage(
+            file="./src/static/logotipo.png", width=300, height=300
         )
-        self._entry_ean_produto = Input(self)
+        Label(self._frame_logotipo, image=self._logotipo, bd=0, bg="#003095").grid()
+
+        self._frame_logotipo.grid(row=0, column=0)
+
+    def _configurar_frame_produto(self):
+        self._frame_produto = Frame(self, bg="gray")
+
+        self._frame_produto.config(bg="#003095")
+        self._frame_produto.grid_columnconfigure([0, 1, 2, 3], weight=1)
+        self._frame_produto.grid_rowconfigure([0, 1, 2], weight=1)
+
+        Etiqueta(text="EAN:", master=self._frame_produto).grid(
+            column=0, row=0, sticky="we", padx=20, pady=20
+        )
+        self._entry_ean_produto = Input(self._frame_produto)
         self._entry_ean_produto.grid(
-            column=3, row=0, columnspan=1, padx=10, pady=10, sticky="we"
+            column=1,
+            row=0,
+            sticky="we",
+            padx=20,
+            pady=20,
         )
 
-        Etiqueta(text="PREÇO", master=self).grid(
-            column=4, row=0, sticky="we", padx=10, pady=10
+        Etiqueta(text="PREÇO:", master=self._frame_produto).grid(
+            column=2, row=0, sticky="we", padx=20, pady=20
         )
-        self._entry_preco = Input(self)
+        self._entry_preco = Input(self._frame_produto)
         self._entry_preco.grid(
-            column=5, row=0, columnspan=1, padx=10, pady=10, sticky="we"
+            column=3,
+            row=0,
+            sticky="we",
+            padx=20,
+            pady=20,
         )
 
-        Etiqueta(text="QUANTIDADE", master=self).grid(
-            column=6, row=0, sticky="we", padx=10, pady=10
+        Etiqueta(text="DESCRIÇÃO:", master=self._frame_produto).grid(
+            column=0, row=1, sticky="we", padx=20, pady=20
         )
-        self._entry_quantidade = Input(self)
-        self._entry_quantidade.grid(
-            column=7, row=0, columnspan=1, padx=10, pady=10, sticky="we"
-        )
-
-        Etiqueta(text="DESCRIÇÃO", master=self).grid(
-            column=2, row=1, sticky="we", padx=10, pady=10
-        )
-        self._entry_descricao = Input(self)
+        self._entry_descricao = Input(self._frame_produto)
         self._entry_descricao.grid(
-            column=3, row=1, columnspan=3, padx=10, pady=10, sticky="we"
+            column=1, row=1, columnspan=3, padx=20, pady=20, sticky="we"
         )
 
-        Etiqueta(text="UNIDADE", master=self).grid(
-            column=6, row=1, sticky="we", padx=10, pady=10
+        Etiqueta(text="QUANTIDADE:", master=self._frame_produto).grid(
+            column=0, row=2, sticky="we", padx=20, pady=20
         )
-        self._entry_unidade = Input(self)
+        self._entry_quantidade = Input(self._frame_produto)
+        self._entry_quantidade.grid(
+            column=1,
+            row=2,
+            sticky="we",
+            padx=20,
+            pady=20,
+        )
+
+        Etiqueta(text="UNIDADE:", master=self._frame_produto).grid(
+            column=2, row=2, sticky="we", padx=20, pady=20
+        )
+        self._entry_unidade = Input(self._frame_produto)
         self._entry_unidade.grid(
-            column=7, row=1, columnspan=1, padx=10, pady=10, sticky="we"
+            column=3, row=2, columnspan=1, padx=20, pady=20, sticky="we"
         )
 
-    def _botoes(self):
-        Etiqueta(text="PEQUISA", master=self).grid(
-            column=0, row=3, sticky="we", padx=10, pady=10
+        self._frame_produto.grid(column=1, row=0, sticky="nsew")
+
+    def _configurar_frame_tabela(self):
+        self._frame_tabela = Frame(self)
+
+        self._frame_tabela.config(bg="#003095")
+        self._frame_tabela.grid_columnconfigure([0, 1, 2, 3, 4, 5], weight=1)
+        self._frame_tabela.grid_rowconfigure(1, weight=1)
+
+        Etiqueta(text="PESQUISA", master=self._frame_tabela, anchor="center").grid(
+            column=0, row=0, sticky="we", padx=20, pady=20
         )
-        self._entry_pesquisa = Input(self)
-        self._entry_pesquisa.grid(column=1, row=3, padx=10, pady=10, sticky="we")
+        self._entry_pesquisa = Input(self._frame_tabela)
+        self._entry_pesquisa.grid(column=1, row=0, sticky="we", padx=20, pady=20)
         self._entry_pesquisa.bind("<KeyRelease>", lambda _: self._filtrar_produtos())
 
-        Botao(text="CADASTRAR", command=self._cadastrar, master=self).grid(
-            column=2, row=3, sticky="we", padx=10, pady=10
+        Botao(
+            text="CADASTRAR", command=self._cadastrar, master=self._frame_tabela
+        ).grid(column=2, row=0, sticky="we", padx=20, pady=20)
+
+        Botao(text="ALTERAR", command=self._alterar, master=self._frame_tabela).grid(
+            column=3, row=0, sticky="we", padx=20, pady=20
         )
 
-        Botao(text="ALTERAR", command=self._alterar, master=self).grid(
-            column=3, row=3, sticky="we", padx=10, pady=10
-        )
-
-        Botao(text="EXCLUIR", command=self._excluir, master=self).grid(
-            column=4, row=3, sticky="we", padx=10, pady=10
+        Botao(text="EXCLUIR", command=self._excluir, master=self._frame_tabela).grid(
+            column=4, row=0, sticky="we", padx=20, pady=20
         )
 
         Botao(
             text="CAIXA",
             command=lambda: self._mostrar_telas("caixa-eletronico"),
-            master=self,
-        ).grid(column=5, row=3, sticky="we", padx=10, pady=10)
+            master=self._frame_tabela,
+        ).grid(column=5, row=0, sticky="we", padx=20, pady=20)
 
-    def _tabela_de_produtos(self):
-        self._tabela = Tabela(self._preencher_entries, self)
-        self._tabela.grid(column=0, row=4, columnspan=8, rowspan=7, sticky="nsew")
+        self._tabela = Tabela(self._preencher_entries, self._frame_tabela)
+        self._tabela.grid(
+            column=0, columnspan=6, sticky="nsew", row=1, padx=20, pady=20
+        )
         produtos = self._produto_controller.buscar()
         self._tabela.listar_produtos(produtos)
+
+        self._frame_tabela.grid(column=0, columnspan=6, row=1, sticky="nsew")
 
     def _filtrar_produtos(self):
         pesquisa = self._entry_pesquisa.get()

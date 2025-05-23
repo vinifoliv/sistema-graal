@@ -1,12 +1,14 @@
 from tkinter import *
+from tkinter import messagebox
 from typing import Callable, List
 
 from controller.produto_controller import ProdutoController
 from controller.venda_controller import VendaController
 from domain.item import Item
-from view.widgets.label import Etiqueta
+from domain.produto import Produto
+from view.widgets.etiqueta import Etiqueta
 from view.widgets.tabela import Tabela
-from view.widgets.button import Botao
+from view.widgets.botao import Botao
 from view.widgets.input import Input
 
 
@@ -77,7 +79,7 @@ class CaixaEletronicoView(Frame):
             column=2, columnspan=6, row=2, sticky="we", padx=10, pady=10
         )
         self._entry_codigo_funcionario.bind(
-            "<KeyRelease>", lambda _: self._atualizar_nome_funcionario()
+            "<KeyRelease>", lambda _: self._atualizar_funcionario()
         )
 
         Etiqueta(text="EAN", master=self).grid(
@@ -158,14 +160,16 @@ class CaixaEletronicoView(Frame):
             column=2, columnspan=6, row=0, padx=10, pady=10, sticky="we"
         )
 
-    def _atualizar_nome_funcionario(self):
+    def _atualizar_funcionario(self):
         codigo_funcionario = self._entry_codigo_funcionario.get()
         funcionario = self._venda_controller.buscar_funcionario_por_codigo(
             codigo_funcionario
         )
+
         if not funcionario:
-            self._etiqueta_nome_funcionario.texto("")
+            self._etiqueta_nome_funcionario.limpar()
             return
+
         self._etiqueta_nome_funcionario.texto(funcionario.nome.upper())
 
     def _cadastrar(self):
@@ -182,28 +186,31 @@ class CaixaEletronicoView(Frame):
         self._limpar_dados_produtos()
 
     def _consultar(self):
-        ean_produto = self._entry_ean_produto.get()
-        produto = self._produto_controller.buscar_por_ean(ean_produto)
-        if not produto:
-            return
-
-        self._entry_ean_produto.texto(produto.ean_produto)
-        self._entry_descricao.texto(produto.descricao)
-        self._entry_preco.texto(produto.preco)
-        self._entry_unidade.texto(produto.unidade)
+        try:
+            ean_produto = self._entry_ean_produto.get()
+            produto = self._produto_controller.buscar_por_ean(ean_produto)
+            self._preencher_dados_produto(produto)
+        except ValueError as e:
+            messagebox.showerror("Erro", e.args[0])
+            self._limpar_dados_produtos()
 
     def _finalizar(self):
-        codigo_funcionario = self._entry_codigo_funcionario.get()
-        self._venda_controller.cadastrar_venda(codigo_funcionario, self._itens_venda)
-
-        self._itens_venda.clear()
-        self._atualizar_tabela()
+        try:
+            codigo_funcionario = self._entry_codigo_funcionario.get()
+            self._venda_controller.cadastrar_venda(
+                codigo_funcionario, self._itens_venda
+            )
+            self._itens_venda.clear()
+            self._atualizar_tabela()
+        except ValueError as e:
+            messagebox.showerror("Erro", e.args[0])
 
     def _calcular_total_item(self):
         quantidade = self._entry_quantidade.get()
-        if quantidade == "":
+        if not quantidade:
             self._entry_total_do_item.texto(0.0)
             return
+
         quantidade = int(quantidade)
         preco = float(self._entry_preco.get())
         total_item = quantidade * preco
@@ -212,6 +219,12 @@ class CaixaEletronicoView(Frame):
     def _calcular_subtotal(self):
         subtotal = sum(item.preco * item.quantidade for item in self._itens_venda)
         return subtotal
+
+    def _preencher_dados_produto(self, produto: Produto):
+        self._entry_ean_produto.texto(produto.ean_produto)
+        self._entry_descricao.texto(produto.descricao)
+        self._entry_preco.texto(produto.preco)
+        self._entry_unidade.texto(produto.unidade)
 
     def _limpar_dados_produtos(self):
         self._entry_ean_produto.limpar()
