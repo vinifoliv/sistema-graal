@@ -40,9 +40,17 @@ class VendaModel:
         for item in venda.itens:
             self._database.execute(
                 """
-            INSERT INTO item(ean_produto, venda_id, quantidade) VALUES(%s, %s, %s)
-            """,
+                INSERT INTO item(ean_produto, venda_id, quantidade) VALUES(%s, %s, %s)
+                """,
                 (item.ean_produto, venda_id, item.quantidade),
+            )
+
+        for item in venda.itens:
+            self._database.execute(
+                """
+                UPDATE produto SET quantidade=quantidade-%s WHERE ean_produto=%s
+                """,
+                (item.quantidade, item.ean_produto),
             )
 
         self._database.commit()

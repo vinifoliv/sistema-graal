@@ -1,4 +1,5 @@
 from tkinter import *
+from tkinter import messagebox
 from typing import Callable
 
 from controller.produto_controller import ProdutoController
@@ -167,31 +168,37 @@ class ControleEstoqueView(Frame):
         self._entry_unidade.texto(produto[4])
 
     def _cadastrar(self):
-        ean_produto = self._entry_ean_produto.get()
-        descricao = self._entry_descricao.get()
-        preco = float(self._entry_preco.get())
-        quantidade = int(self._entry_quantidade.get())
-        unidade = self._entry_unidade.get()
+        try:
+            ean_produto = self._entry_ean_produto.get()
+            descricao = self._entry_descricao.get()
+            preco = float(self._entry_preco.get())
+            quantidade = int(self._entry_quantidade.get())
+            unidade = self._entry_unidade.get()
 
-        self._produto_controller.cadastrar(
-            ean_produto, descricao, preco, quantidade, unidade
-        )
+            self._produto_controller.cadastrar(
+                ean_produto, descricao, preco, quantidade, unidade
+            )
 
-        self._limpar_dados()
-        self._filtrar_produtos()
+            self._limpar_dados()
+            self._filtrar_produtos()
+        except ValueError as e:
+            messagebox.showerror("Erro", e.args[0])
 
     def _alterar(self):
-        ean_produto = self._entry_ean_produto.get()
-        descricao = self._entry_descricao.get()
-        preco = float(self._entry_preco.get())
-        quantidade = int(self._entry_quantidade.get())
-        unidade = self._entry_unidade.get()
+        try:
+            ean_produto = self._entry_ean_produto.get()
+            descricao = self._entry_descricao.get()
+            preco = float(self._entry_preco.get())
+            quantidade = int(self._entry_quantidade.get())
+            unidade = self._entry_unidade.get()
 
-        self._produto_controller.alterar(
-            ean_produto, descricao, preco, quantidade, unidade
-        )
+            self._produto_controller.alterar(
+                ean_produto, descricao, preco, quantidade, unidade
+            )
 
-        self._limpar_dados()
+            self._limpar_dados()
+        except ValueError as e:
+            messagebox.showerror("Erro", e.args[0])
 
     def _excluir(self):
         ean_produto = self._entry_ean_produto.get()
