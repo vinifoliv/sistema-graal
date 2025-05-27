@@ -10,7 +10,7 @@ produto_model = ProdutoModel(database)
 venda_model = VendaModel(database)
 
 produto_controller = ProdutoController(produto_model)
-venda_controller = VendaController(venda_model)
+venda_controller = VendaController(produto_model, venda_model)
 
 app = App(produto_controller, venda_controller)
 app.executar()
