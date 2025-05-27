@@ -11,6 +11,7 @@ class App:
         self, produto_controller: ProdutoController, venda_controller: VendaController
     ):
         self._root = Tk()
+        self._root.title("Sistema Graal")
         self._root.state("zoomed")
         self._configurar_tela(self._root)
 
