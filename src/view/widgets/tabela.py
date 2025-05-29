@@ -36,7 +36,6 @@ class Tabela(Treeview):
             self.delete(produto)
 
         for produto in produtos:
-            print(produto.unidade)
             self.insert(
                 "",
                 END,

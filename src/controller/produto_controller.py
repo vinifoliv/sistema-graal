@@ -46,6 +46,10 @@ class ProdutoController:
     
     def buscar_por_ean(self, ean_produto: str) -> Produto | None:
         produto = self._produto_model.buscar_por_ean(ean_produto)
+
+        if not produto:
+            raise ValueError("Produto não encontrado!")
+        
         return produto
     
     def filtrar_por_descricao(self, descricao: str) -> List[Produto]:

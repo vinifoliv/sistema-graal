@@ -1,5 +1,3 @@
-from datetime import date
-
 from database.database import Database
 from domain.funcionario import Funcionario
 from domain.venda import Venda
@@ -27,9 +25,9 @@ class VendaModel:
     def cadastrar_venda(self, venda: Venda):
         self._database.execute(
             """
-            INSERT INTO venda(codigo_funcionario) VALUES(%s)
+            INSERT INTO venda(codigo_funcionario, nome_cliente) VALUES(%s, %s)
             """,
-            (venda.codigo_funcionario,),
+            (venda.codigo_funcionario, venda.nome_cliente),
         )
 
         self._database.execute(
@@ -42,9 +40,17 @@ class VendaModel:
         for item in venda.itens:
             self._database.execute(
                 """
-            INSERT INTO item(ean_produto, venda_id, quantidade) VALUES(%s, %s, %s)
-            """,
+                INSERT INTO item(ean_produto, venda_id, quantidade) VALUES(%s, %s, %s)
+                """,
                 (item.ean_produto, venda_id, item.quantidade),
+            )
+
+        for item in venda.itens:
+            self._database.execute(
+                """
+                UPDATE produto SET quantidade=quantidade-%s WHERE ean_produto=%s
+                """,
+                (item.quantidade, item.ean_produto),
             )
 
         self._database.commit()
