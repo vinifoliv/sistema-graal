@@ -1,6 +1,3 @@
-from decimal import Decimal
-
-
 class Produto:
     def __init__(
         self,

@@ -1,4 +1,3 @@
-from decimal import Decimal
 from typing import List
 from domain.produto import Produto
 from model.produto_model import ProdutoModel
