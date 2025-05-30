@@ -20,7 +20,6 @@ class Tabela(Treeview):
             self.column(coluna, anchor="center")
 
         self.bind("<Double-1>", self._preencher_entries)
-        
 
     def _configurar_estilo(self):
         self._style = Style(self.master)
