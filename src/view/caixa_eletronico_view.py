@@ -223,11 +223,11 @@ class CaixaEletronicoView(Frame):
 
         quantidade = int(quantidade)
         preco = float(self._entry_preco.get())
-        total_item = quantidade * preco
+        total_item = round(quantidade * preco, 2)
         self._entry_total_do_item.texto(total_item)
 
     def _calcular_subtotal(self):
-        subtotal = sum(item.preco * item.quantidade for item in self._itens_venda)
+        subtotal = round(sum(item.preco * item.quantidade for item in self._itens_venda), 2)
         return subtotal
 
     def _preencher_dados_produto(self, produto: Produto):
@@ -255,5 +255,5 @@ class CaixaEletronicoView(Frame):
     def _atualizar_troco(self):
         subtotal = self._calcular_subtotal()
         total_recebido = float(self._entry_total_recebido.get() or 0)
-        troco = max(total_recebido - subtotal, 0.0)
+        troco = round(max(total_recebido - subtotal, 0.0), 2)
         self._entry_troco.texto(troco)
