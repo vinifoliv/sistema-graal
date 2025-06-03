@@ -64,10 +64,11 @@ class ProdutoModel:
         )
 
         produto = self._database.fetchone()
+        self._database.fechar_conexao()
+
         if not produto:
             return None
 
-        self._database.fechar_conexao()
         return self._montar_produto(produto)
 
     def buscar_por_ean(self, ean_produto: str) -> Produto | None:
@@ -80,10 +81,11 @@ class ProdutoModel:
         )
 
         produto = self._database.fetchone()
+        self._database.fechar_conexao()
+
         if not produto:
             return None
 
-        self._database.fechar_conexao()
         return self._montar_produto(produto)
 
     def filtrar_por_descricao(self, descricao: str) -> List[Produto]:

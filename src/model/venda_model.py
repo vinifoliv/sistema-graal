@@ -10,6 +10,7 @@ class VendaModel:
     def buscar_funcionario_por_codigo(
         self, codigo_funcionario: str
     ) -> Funcionario | None:
+        self._database.conectar()
         self._database.execute(
             """
             SELECT * FROM funcionario WHERE codigo_funcionario=%s
@@ -18,11 +19,15 @@ class VendaModel:
         )
 
         funcionario = self._database.fetchone()
+        self._database.fechar_conexao()
+
         if not funcionario:
             return None
+
         return self._montar_funcionario(funcionario)
 
     def cadastrar_venda(self, venda: Venda):
+        self._database.conectar()
         self._database.execute(
             """
             INSERT INTO venda(codigo_funcionario, nome_cliente) VALUES(%s, %s)
@@ -54,6 +59,7 @@ class VendaModel:
             )
 
         self._database.commit()
+        self._database.fechar_conexao()
 
     def _montar_funcionario(self, funcionario) -> Funcionario:
         codigo = funcionario[0]
