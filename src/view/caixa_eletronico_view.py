@@ -196,10 +196,9 @@ class CaixaEletronicoView(Frame):
 
             self._itens_venda.append(novo_item)
             self._atualizar_tabela()
+            self._limpar_dados_produtos()
         except ValueError as e:
             messagebox.showerror("Erro", e.args[0])
-        finally:
-            self._limpar_dados_produtos()
 
     def _consultar(self):
         try:
