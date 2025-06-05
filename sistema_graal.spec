@@ -5,7 +5,10 @@ a = Analysis(
     ['src\\main.py'],
     pathex=['src'],
     binaries=[],
-    datas=[('src', 'src')],
+    datas=[
+        ('src', 'src'),
+        ('src/static/graal.ico', 'src/static')
+    ],
     hiddenimports=[
         'mysql', 
         'mysql.connector', 
@@ -64,5 +67,5 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon=['src\\static\\sistema-graal-icone.ico'],
+    icon=['src\\static\\graal.ico'],
 )

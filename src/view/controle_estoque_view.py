@@ -14,11 +14,13 @@ class ControleEstoqueView(Frame):
         self,
         produto_controller: ProdutoController,
         mostrar_telas: Callable,
+        gerar_caminho_imagem: Callable,
         master=None,
     ):
         super().__init__(master)
         self._produto_controller = produto_controller
         self._mostrar_telas = mostrar_telas
+        self._gerar_caminho_imagem = gerar_caminho_imagem
 
         self.config(bg="#003095")
 
@@ -33,7 +35,7 @@ class ControleEstoqueView(Frame):
         self._frame_logotipo = Frame(self, bg="#000000")
 
         self._logotipo = PhotoImage(
-            file="./src/static/logotipo.png", width=300, height=300
+            file=self._gerar_caminho_imagem("logotipo.png"), width=300, height=300
         )
         Label(self._frame_logotipo, image=self._logotipo, bd=0, bg="#003095").grid()
 
@@ -201,9 +203,12 @@ class ControleEstoqueView(Frame):
             messagebox.showerror("Erro", e.args[0])
 
     def _excluir(self):
-        ean_produto = self._entry_ean_produto.get()
-        self._produto_controller.excluir(ean_produto)
-        self._limpar_dados()
+        try:
+            ean_produto = self._entry_ean_produto.get()
+            self._produto_controller.excluir(ean_produto)
+            self._limpar_dados()
+        except ValueError as e:
+            messagebox.showerror("Erro", e.args[0])
 
     def _limpar_dados(self):
         self._entry_ean_produto.limpar()

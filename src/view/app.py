@@ -1,3 +1,5 @@
+import os
+import sys
 from tkinter import *
 
 from controller.produto_controller import ProdutoController
@@ -13,6 +15,10 @@ class App:
         self._root = Tk()
         self._root.title("Sistema Graal")
         self._root.state("zoomed")
+
+        self._icone = self._gerar_caminho_imagem("graal.ico")
+        self._root.iconbitmap(self._icone)
+
         self._configurar_tela(self._root)
 
         self._telas = {
@@ -20,11 +26,13 @@ class App:
                 produto_controller,
                 venda_controller,
                 self._mostrar_tela,
+                self._gerar_caminho_imagem,
                 self._root,
             ),
             "controle-estoque": ControleEstoqueView(
                 produto_controller,
                 self._mostrar_tela,
+                self._gerar_caminho_imagem,
                 self._root,
             ),
         }
@@ -45,3 +53,11 @@ class App:
     def _mostrar_tela(self, nome_tela: str):
         frame = self._telas[nome_tela]
         frame.tkraise()
+
+    def _gerar_caminho_imagem(self, imagem: str) -> str:
+        caminho_base = os.path.abspath(".")
+
+        if getattr(sys, "frozen", False):
+            caminho_base = sys._MEIPASS
+
+        return os.path.join(caminho_base, "src", "static", imagem)

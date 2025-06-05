@@ -19,11 +19,13 @@ class CaixaEletronicoView(Frame):
         produto_controller: ProdutoController,
         venda_controller: VendaController,
         mostrar_tela: Callable,
+        gerar_caminho_imagem: Callable,
         master: Tk = None,
     ):
         super().__init__(master)
         self._produto_controller = produto_controller
         self._venda_controller = venda_controller
+        self._gerar_caminho_imagem = gerar_caminho_imagem
         self._mostrar_tela = mostrar_tela
 
         self._itens_venda: List[Item] = []
@@ -79,7 +81,7 @@ class CaixaEletronicoView(Frame):
         self._frame_produto.grid_rowconfigure(0, weight=1)
 
         self.logotipo = PhotoImage(
-            file="./src/static/logotipo150x150.png", width=150, height=150
+            file=self._gerar_caminho_imagem("logotipo150x150.png"), width=150, height=150
         )
         Label(self._frame_produto, image=self.logotipo, bd=0, bg="#003095").grid(
             column=0, columnspan=4, row=0, sticky="snew", padx=20, pady=20
