@@ -8,6 +8,7 @@ class ProdutoModel:
         self._database = database
 
     def cadastrar(self, produto: Produto):
+        self._database.conectar()
         self._database.execute(
             """
             INSERT INTO produto(ean_produto, descricao, preco, quantidade, unidade)
@@ -22,8 +23,10 @@ class ProdutoModel:
             ),
         )
         self._database.commit()
+        self._database.fechar_conexao()
 
     def alterar(self, produto: Produto):
+        self._database.conectar()
         self._database.execute(
             """
             UPDATE produto SET descricao=%s, preco=%s, quantidade=%s, unidade=%s
@@ -38,17 +41,21 @@ class ProdutoModel:
             ),
         )
         self._database.commit()
+        self._database.fechar_conexao()
 
     def buscar(self) -> List[Produto]:
+        self._database.conectar()
         self._database.execute(
             """
             SELECT * FROM produto
             """
         )
         produtos = self._database.fetchall()
+        self._database.fechar_conexao()
         return list(map(lambda p: self._montar_produto(p), produtos))
 
     def buscar_por_descricao(self, descricao: str) -> Produto | None:
+        self._database.conectar()
         self._database.execute(
             """
             SELECT * FROM produto WHERE descricao=%s
@@ -57,12 +64,15 @@ class ProdutoModel:
         )
 
         produto = self._database.fetchone()
+        self._database.fechar_conexao()
+
         if not produto:
             return None
 
         return self._montar_produto(produto)
 
     def buscar_por_ean(self, ean_produto: str) -> Produto | None:
+        self._database.conectar()
         self._database.execute(
             """
             SELECT * FROM produto WHERE ean_produto=%s
@@ -71,12 +81,15 @@ class ProdutoModel:
         )
 
         produto = self._database.fetchone()
+        self._database.fechar_conexao()
+
         if not produto:
             return None
 
         return self._montar_produto(produto)
 
     def filtrar_por_descricao(self, descricao: str) -> List[Produto]:
+        self._database.conectar()
         self._database.execute(
             """
             SELECT * FROM produto WHERE LOWER(descricao) LIKE LOWER(%s)
@@ -85,9 +98,11 @@ class ProdutoModel:
         )
 
         produtos = self._database.fetchall()
+        self._database.fechar_conexao()
         return list(map(lambda p: self._montar_produto(p), produtos))
 
     def excluir(self, ean_produto: str):
+        self._database.conectar()
         self._database.execute(
             """
             DELETE FROM produto WHERE ean_produto=%s
@@ -95,6 +110,7 @@ class ProdutoModel:
             (ean_produto,),
         )
         self._database.commit()
+        self._database.fechar_conexao()
 
     def _montar_produto(self, produto) -> Produto:
         ean_produto = produto[0]

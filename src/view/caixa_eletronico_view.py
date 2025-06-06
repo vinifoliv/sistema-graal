@@ -19,11 +19,13 @@ class CaixaEletronicoView(Frame):
         produto_controller: ProdutoController,
         venda_controller: VendaController,
         mostrar_tela: Callable,
+        gerar_caminho_imagem: Callable,
         master: Tk = None,
     ):
         super().__init__(master)
         self._produto_controller = produto_controller
         self._venda_controller = venda_controller
+        self._gerar_caminho_imagem = gerar_caminho_imagem
         self._mostrar_tela = mostrar_tela
 
         self._itens_venda: List[Item] = []
@@ -79,7 +81,7 @@ class CaixaEletronicoView(Frame):
         self._frame_produto.grid_rowconfigure(0, weight=1)
 
         self.logotipo = PhotoImage(
-            file="./src/static/logotipo150x150.png", width=150, height=150
+            file=self._gerar_caminho_imagem("logotipo150x150.png"), width=150, height=150
         )
         Label(self._frame_produto, image=self.logotipo, bd=0, bg="#003095").grid(
             column=0, columnspan=4, row=0, sticky="snew", padx=20, pady=20
@@ -180,17 +182,23 @@ class CaixaEletronicoView(Frame):
         self._etiqueta_nome_funcionario.texto(funcionario.nome.upper())
 
     def _incluir(self):
-        ean_produto = self._entry_ean_produto.get()
-        descricao = self._entry_descricao.get()
-        preco = float(self._entry_preco.get())
-        quantidade = int(self._entry_quantidade.get())
-        unidade = self._entry_unidade.get()
+        try:
+            if self._campos_estao_vazios():
+                raise ValueError("Produto não especificado!")
 
-        novo_item = Item(ean_produto, descricao, preco, quantidade, unidade)
+            ean_produto = self._entry_ean_produto.get()
+            descricao = self._entry_descricao.get()
+            preco = float(self._entry_preco.get())
+            quantidade = int(self._entry_quantidade.get())
+            unidade = self._entry_unidade.get()
 
-        self._itens_venda.append(novo_item)
-        self._atualizar_tabela()
-        self._limpar_dados_produtos()
+            novo_item = Item(ean_produto, descricao, preco, quantidade, unidade)
+
+            self._itens_venda.append(novo_item)
+            self._atualizar_tabela()
+            self._limpar_dados_produtos()
+        except ValueError as e:
+            messagebox.showerror("Erro", e.args[0])
 
     def _consultar(self):
         try:
@@ -223,11 +231,11 @@ class CaixaEletronicoView(Frame):
 
         quantidade = int(quantidade)
         preco = float(self._entry_preco.get())
-        total_item = quantidade * preco
+        total_item = round(quantidade * preco, 2)
         self._entry_total_do_item.texto(total_item)
 
     def _calcular_subtotal(self):
-        subtotal = sum(item.preco * item.quantidade for item in self._itens_venda)
+        subtotal = round(sum(item.preco * item.quantidade for item in self._itens_venda), 2)
         return subtotal
 
     def _preencher_dados_produto(self, produto: Produto):
@@ -255,5 +263,18 @@ class CaixaEletronicoView(Frame):
     def _atualizar_troco(self):
         subtotal = self._calcular_subtotal()
         total_recebido = float(self._entry_total_recebido.get() or 0)
-        troco = max(total_recebido - subtotal, 0.0)
+        troco = round(max(total_recebido - subtotal, 0.0), 2)
         self._entry_troco.texto(troco)
+
+    def _campos_estao_vazios(self):
+        ean_produto_vazio = self._entry_ean_produto.get() == ""
+        descricao_vazia = self._entry_descricao.get() == ""
+        preco_vazio = self._entry_preco.get() == ""
+        quantidade_vazia = self._entry_quantidade.get() == ""
+        unidade_vazia = self._entry_unidade.get() == ""
+
+        if ean_produto_vazio or  descricao_vazia or preco_vazio or quantidade_vazia or unidade_vazia:
+            return True
+
+        return False
+            
