@@ -7,7 +7,7 @@ class Produto:
         quantidade: int,
         unidade: str,
     ):
-        self._validar(preco, quantidade)
+        self._validar(ean_produto, preco, quantidade)
 
         self.ean_produto = ean_produto
         self.descricao = descricao
@@ -15,7 +15,10 @@ class Produto:
         self.quantidade = quantidade
         self.unidade = unidade
 
-    def _validar(self, preco: float, quantidade: int):
+    def _validar(self, ean_produto: str, preco: float, quantidade: int):
+        if len(ean_produto) != 13:
+            raise ValueError("O EAN deve conter 13 caracteres")
+            
         if preco < 0:
             raise ValueError("O preço não pode ser negativo")
         

@@ -171,6 +171,9 @@ class ControleEstoqueView(Frame):
 
     def _cadastrar(self):
         try:
+            if self._campos_estao_vazios():
+                raise ValueError("Preencher todos os campos do produto!")
+
             ean_produto = self._entry_ean_produto.get()
             descricao = self._entry_descricao.get()
             preco = float(self._entry_preco.get())
@@ -188,6 +191,9 @@ class ControleEstoqueView(Frame):
 
     def _alterar(self):
         try:
+            if self._campos_estao_vazios():
+                raise ValueError("Preencher todos os campos do produto!")
+
             ean_produto = self._entry_ean_produto.get()
             descricao = self._entry_descricao.get()
             preco = float(self._entry_preco.get())
@@ -217,3 +223,15 @@ class ControleEstoqueView(Frame):
         self._entry_descricao.limpar()
         self._entry_unidade.limpar()
         self._filtrar_produtos()
+
+    def _campos_estao_vazios(self):
+        ean_produto_vazio = self._entry_ean_produto.get() == ""
+        descricao_vazia = self._entry_descricao.get() == ""
+        preco_vazio = self._entry_preco.get() == ""
+        quantidade_vazia = self._entry_quantidade.get() == ""
+        unidade_vazia = self._entry_unidade.get() == ""
+
+        if ean_produto_vazio or  descricao_vazia or preco_vazio or quantidade_vazia or unidade_vazia:
+            return True
+
+        return False
