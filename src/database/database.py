@@ -8,7 +8,7 @@ class Database:
 
     def conectar(self):
         if self._conexao:
-            raise ValueError("Já existe uma conexão com o banco!")
+           return 
 
         self._conexao = mysql.connector.connect(
             user="root", password="9572", host="localhost", database="sistema_graal"
@@ -17,7 +17,7 @@ class Database:
 
     def fechar_conexao(self):
         if not self._conexao:
-            raise ValueError("Conexão com banco não encontrada!")
+            return
 
         self._conexao.close()
 
